@@ -14,26 +14,34 @@ jobs:
 
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Debug - List Repository Files
         run: ls -l
 
+      - name: Build Docker Image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          tags: ghcr.io/YOUR-GITHUB-USERNAME/devsecops-ci-cd:latest  # Replace with your namespace
+          load: true  # Load image locally for Trivy to scan
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
       - name: Scan Docker Image with Trivy
         uses: aquasecurity/trivy-action@master
         with:
-          image-ref: ghcr.io/my-org/devsecops-ci-cd:latest  # Replace with your namespace
+          image-ref: ghcr.io/YOUR-GITHUB-USERNAME/devsecops-ci-cd:latest  # Replace with your namespace
           exit-code: '1'
           severity: 'CRITICAL'
 
-      - name: Build and Push Docker Image
+      - name: Push Docker Image
         uses: docker/build-push-action@v5
         with:
           context: .
           push: true
-          tags: ghcr.io/my-org/devsecops-ci-cd:latest
+          tags: ghcr.io/YOUR-GITHUB-USERNAME/devsecops-ci-cd:latest  # Replace with your namespace
           cache-from: type=gha
           cache-to: type=gha,mode=max
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
