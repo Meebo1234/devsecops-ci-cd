@@ -13,6 +13,15 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v3
 
+      - name: Debug - Check if GHCR_PAT exists
+        run: |
+       if [ -z "${{ secrets.GHCR_PAT }}" ]; then
+         echo "❌ GHCR_PAT secret is EMPTY or NOT SET in GitHub Secrets!"
+         exit 1
+       else
+         echo "✅ GHCR_PAT secret is correctly set."
+       fi
+
       - name: Log in to GitHub Container Registry
         run: echo "${{ secrets.GHCR_PAT }}" | docker login ghcr.io --username ${{ github.actor }} --password-stdin
 
